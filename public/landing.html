@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Selamat Datang di Asta Panel 🦅</title>
+    <meta name="theme-color" content="#e6f0ff" />
+    <link rel="icon" href="https://files.catbox.moe/bzkzuc.jpg" />
+    <link rel="stylesheet" href="styles/style.css" />
+    <link rel="stylesheet" href="styles/landing.css" />
+    <script>
+      (function () {
+        try {
+          const stored = localStorage.getItem("theme");
+          const prefersDark =
+            window.matchMedia &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches;
+          const theme = stored || (prefersDark ? "dark" : "light");
+          document.documentElement.setAttribute("data-theme", theme);
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <div class="overlay"></div>
+    <header>
+      <img class="logo" src="https://files.catbox.moe/bzkzuc.jpg" alt="Logo" />
+      <div style="font-size: 22px; font-weight: 700">Asta Panel 🦅</div>
+      <button
+        id="theme-toggle"
+        class="theme-toggle"
+        type="button"
+        aria-pressed="false"
+        title="Ganti tema"
+      >
+        <span id="theme-icon" aria-hidden="true">🌙</span>
+      </button>
+    </header>
+
+    <main class="landing-main">
+      <section class="hero-section">
+        <h1>Platform Panel Terbaik Anda</h1>
+        <p class="subtitle">
+          Kelola semua kebutuhan panel Anda di satu tempat dengan mudah dan
+          cepat. Lihat penawaran terbaik kami di bawah ini.
+        </p>
+        <a href="/login" class="cta-button primary">Masuk ke Panel</a>
+      </section>
+
+      <section class="pricelist-section">
+        <h2>Daftar Harga</h2>
+        <div class="pricelist-grid">
+          <div class="price-card">
+            <div class="card-header">
+              <h3>🔄📦 Reseller Panel</h3>
+              <span class="price">Rp 5.000 <small>/ PERMANEN</small></span>
+            </div>
+            <ul class="benefits-list">
+              <li>Bisa Buat Panel Sepuasnya</li>
+              <li>Bisa Jual Panel</li>
+              <li>Bisa Open Bot Pushkontak</li>
+            </ul>
+          </div>
+
+          <div class="price-card">
+            <div class="card-header">
+              <h3>🔄📦 Reseller Panel Private</h3>
+              <span class="price">Rp 20.000 <small>/ PERMANEN</small></span>
+            </div>
+            <ul class="benefits-list">
+              <li>Bisa Buat Panel Sepuasnya</li>
+              <li>Bisa Jual Panel</li>
+              <li>Bisa Open Bot Pushkontak</li>
+              <li>
+                Keamanan Panel terjamin (anti rusuh² dan curi session maupun sc
+                kalian)
+              </li>
+            </ul>
+          </div>
+
+          <div class="price-card">
+            <div class="card-header">
+              <h3>👤🛡️ Admin Panel</h3>
+              <span class="price">Rp 10.000 <small>/ PERMANEN</small></span>
+            </div>
+            <ul class="benefits-list">
+              <li>Semua benefit Reseller</li>
+              <li>Bisa Open Reseller Panel</li>
+            </ul>
+          </div>
+
+          <div class="price-card">
+            <div class="card-header">
+              <h3>🫂 PT Panel</h3>
+              <span class="price">Rp 20.000 <small>/ PERMANEN</small></span>
+            </div>
+            <ul class="benefits-list">
+              <li>Semua benefit Admin Panel</li>
+              <li>Bisa Open Admin Panel</li>
+            </ul>
+          </div>
+
+          <div class="price-card featured">
+            <div class="card-badge">Paling Laris</div>
+            <div class="card-header">
+              <h3>👑 Own panel</h3>
+              <span class="price">Rp 25.000 <small>/ PERMANEN</small></span>
+            </div>
+            <ul class="benefits-list">
+              <li>Semua benefit PT Panel</li>
+              <li>Bisa Open PT Panel</li>
+            </ul>
+          </div>
+
+          <div class="price-card">
+            <div class="card-header">
+              <h3>🤝 Tangan Kanan Panel</h3>
+              <span class="price">Rp 35.000 <small>/ PERMANEN</small></span>
+            </div>
+            <ul class="benefits-list">
+              <li>Semua benefit Own Panel</li>
+              <li>Bisa Open Own Panel</li>
+            </ul>
+          </div>
+
+          <div class="price-card">
+            <div class="card-header">
+              <h3>🚀 CEO Panel</h3>
+              <span class="price">Rp 65.000 <small>/ PERMANEN</small></span>
+            </div>
+            <ul class="benefits-list">
+              <li>Semua benefit TK Panel</li>
+              <li>Bisa Open TK Panel</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="contact-section">
+        <h2>Berminat? Hubungi Kami!</h2>
+        <p class="subtitle">
+          Pilih salah satu admin di bawah ini untuk melakukan pemesanan.
+        </p>
+        <div class="admin-buttons">
+          <a
+            href="https://t.me/Astastorea"
+            target="_blank"
+            class="cta-button secondary"
+            >Chat Admin 1 (@Astastorea)</a
+          >
+          <a
+            href="https://t.me/Lorddzik"
+            target="_blank"
+            class="cta-button secondary"
+            >Chat Admin 2 (@Lorddzik)</a
+          >
+        </div>
+      </section>
+    </main>
+
+    <!-- Modal Pengumuman -->
+    <div id="announcement-modal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <div id="announcement-body">
+          <!-- Konten pengumuman akan dimuat di sini -->
+        </div>
+      </div>
+    </div>
+
+    <footer>© <span id="y"></span> Asta Panel 🦅 · Dibuat dengan ❤</footer>
+
+    <script>
+      document.getElementById("y").textContent = new Date().getFullYear();
+      const themeToggleBtn = document.getElementById("theme-toggle");
+      const themeIcon = document.getElementById("theme-icon");
+      function applyThemeUI(theme) {
+        const t = theme === "dark";
+        themeToggleBtn.setAttribute("aria-pressed", String(t)),
+          (themeIcon.textContent = t ? "☀️" : "🌙"),
+          document
+            .querySelector('meta[name="theme-color"]')
+            .setAttribute("content", t ? "#0b1220" : "#e6f0ff");
+      }
+      function setTheme(theme) {
+        document.documentElement.setAttribute("data-theme", theme);
+        try {
+          localStorage.setItem("theme", theme);
+        } catch (e) {}
+        applyThemeUI(theme);
+      }
+      applyThemeUI(
+        document.documentElement.getAttribute("data-theme") || "light"
+      ),
+        themeToggleBtn.addEventListener("click", () => {
+          const t =
+            document.documentElement.getAttribute("data-theme") || "light";
+          setTheme(t === "dark" ? "light" : "dark");
+        });
+
+      // Modal functionality
+      const modal = document.getElementById('announcement-modal');
+      const closeBtn = document.querySelector('.close');
+
+      closeBtn.addEventListener('click', () => {
+        modal.style.display = 'none';
+      });
+
+      window.addEventListener('click', (event) => {
+        if (event.target === modal) {
+          modal.style.display = 'none';
+        }
+      });
+
+      // Load announcements and show latest as modal
+      async function loadAnnouncements() {
+        try {
+          const response = await fetch('/api/announcements');
+          const data = await response.json();
+          if (data.status && data.announcements.length > 0) {
+            const latestAnn = data.announcements[data.announcements.length - 1]; // Latest one
+            const body = document.getElementById('announcement-body');
+            body.innerHTML = `
+              ${latestAnn.photoUrl ? `<img src="${latestAnn.photoUrl}" alt="Announcement Image" style="max-width: 100%; height: auto; margin-bottom: 10px; border-radius: 8px;">` : ''}
+              <h3>Pengumuman</h3>
+              <p>${latestAnn.text}</p>
+              <small>${new Date(latestAnn.timestamp).toLocaleString('id-ID')}</small>
+            `;
+            modal.style.display = 'block';
+          }
+        } catch (error) {
+          console.error('Gagal memuat pengumuman:', error);
+        }
+      }
+      loadAnnouncements();
+    </script>
+  </body>
+</html>
