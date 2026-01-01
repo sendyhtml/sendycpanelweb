@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tambah Server - Asta Panel 🦅</title>
+  <meta name="theme-color" content="#0ea5e9" />
+  <link rel="icon" href="https://files.catbox.moe/bzkzuc.jpg" />
+  <link rel="stylesheet" href="styles/panel.css" />
+  <script>
+    (function () {
+      try {
+        const stored = localStorage.getItem("theme");
+        const prefersDark =
+          window.matchMedia &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const theme = stored || (prefersDark ? "dark" : "light");
+        document.documentElement.setAttribute("data-theme", theme);
+      } catch (e) {}
+    })();
+  </script>
+  <style>
+    /* CSS Tambahan untuk 2 Card */
+    main {
+      flex-direction: row;
+      align-items: center; 
+      justify-content: center; 
+      gap: 24px;
+      max-width: 900px; 
+      width: 100%;
+      margin: 0 auto; 
+      padding: 50px 24px; 
+      box-sizing: border-box;
+    }
+    .card {
+      flex: 1; 
+      min-width: 350px;
+      margin-top: 0;
+    }
+    /* Responsive untuk mobile */
+    @media (max-width: 800px) {
+      main {
+        flex-direction: column;
+        align-items: center;
+        padding: 24px; 
+        gap: 24px;
+      }
+      .card {
+        width: 100%;
+        max-width: 450px;
+        min-width: 300px; 
+      }
+    }
+
+    /* [CSS DROPDOWN YANG DIPERBAIKI] */
+    .panel-label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    .panel-selector-container {
+      position: relative;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background-color: var(--input-bg);
+      margin-bottom: 16px;
+    }
+    .panel-selector-header {
+      padding: 12px 16px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    #current-panel-display-asta,
+    #current-panel-display-luar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    #current-panel-display-asta .status-dot,
+    #current-panel-display-luar .status-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--success);
+      border-radius: 50%;
+    }
+    .panel-selector-header .arrow,
+    .custom-select-trigger .arrow {
+      border: solid var(--text-secondary);
+      border-width: 0 2px 2px 0;
+      display: inline-block;
+      padding: 3px;
+      transform: rotate(45deg);
+      transition: transform 0.2s ease;
+    }
+    .panel-selector-container.open .arrow,
+    .custom-select-wrapper.open .arrow {
+      transform: rotate(-135deg);
+    }
+    .panel-options {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, padding 0.3s ease;
+      border-top: 1px solid transparent;
+      position: absolute;
+      width: 100%;
+      left: 0;
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 12px 12px;
+      z-index: 20;
+    }
+    .panel-selector-container.open .panel-options {
+      max-height: 200px;
+      padding: 5px 0;
+    }
+    .panel-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 20px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      font-weight: 500;
+    }
+    .panel-option.active {
+      background-color: var(--brand);
+      color: white;
+    }
+    .panel-option:not(.active):hover {
+      background-color: rgba(37, 99, 235, 0.1);
+    }
+    .custom-select-wrapper {
+      position: relative;
+      user-select: none;
+    }
+    .custom-select-trigger {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 14px;
+      background: var(--input-bg);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      height: 46px;
+      box-sizing: border-box;
+    }
+    .custom-select-wrapper.open .custom-select-trigger {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+      border-color: var(--brand-strong);
+      box-shadow: 0 0 0 4px var(--ring);
+    }
+    .custom-options {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 12px 12px;
+      z-index: 10;
+      max-height: 0;
+      overflow-y: auto;
+      transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+      padding: 0;
+      box-shadow: var(--shadow);
+    }
+    .custom-select-wrapper.open .custom-options {
+      max-height: 220px;
+      padding: 5px 0;
+    }
+    .custom-option {
+      padding: 12px 20px;
+      cursor: pointer;
+      color: var(--text-primary);
+      transition: background-color 0.2s;
+    }
+    .custom-option.selected {
+      background-color: var(--brand);
+      color: white;
+      font-weight: 600;
+    }
+    .custom-option:not(.selected):hover {
+      background-color: rgba(37, 99, 235, 0.1);
+    }
+
+    /* Atur dropdown RAM agar terbuka ke atas */
+    #ram-selector-asta .custom-options,
+    #ram-selector-luar .custom-options {
+      top: auto;
+      bottom: 100%;
+      border-top: 1px solid var(--border);
+      border-bottom: none;
+      border-radius: 12px 12px 0 0;
+    }
+    #ram-selector-asta.open .custom-select-trigger,
+    #ram-selector-luar.open .custom-select-trigger {
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+      border-bottom-left-radius: 12px;
+      border-bottom-right-radius: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div id="sidebar-overlay" class="sidebar-overlay"></div>
+  <nav id="sidebar" class="sidebar">
+    <button id="sidebar-close-btn" class="close-btn">&times;</button>
+    <div class="sidebar-profile">
+      <img
+        src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iY3VycmVudENvbG9yIj48cGF0aCBkPSJNMTIgMTJjMi4yMSAwIDQtMS43OSA0LTRzLTEuNzktNC00LTQtNCAxLjc5LTQgNCAxLjc5IDQgNCA0em0wIDJjLTIuNjcgMC04IDEuMzQtOCA0djJoMTZ2LTJjMC0yLjY2LTUuMzMtNC04LTR6Ii8+PC9zdmc+"
+        alt="Profile"
+        class="profile-pic"
+      />
+      <div class="profile-details">
+        <span class="profile-name">Memuat...</span>
+        <span class="profile-role">Memuat...</span>
+      </div>
+    </div>
+    <a href="/panel" id="admin-global-panel-link">
+      <span class="icon">📊</span> Buat Panel
+    </a>
+    <a href="/add-server" id="admin-global-server-link">
+      <span class="icon">➕</span> Tambah Server
+    </a>
+    <a href="/panel" id="panel-asta-link" style="display: none;">
+      <span class="text"><span class="icon">📊</span>Buat Panel</span>
+    </a>
+    <a href="/add-server" id="server-asta-link" style="display: none;">
+      <span class="text"><span class="icon">➕</span>Add Server</span>
+    </a>
+    <a href="/panel-luar" id="panel-luar-link" style="display: none;">
+      <span class="icon">🌐</span> Buat Panel (Luar)
+    </a>
+    <a href="/add-server-luar" id="server-luar-link" style="display: none;">
+      <span class="icon">🌐</span> Tambah Server (Luar)
+    </a>
+    <a href="/admin" id="admin-page-link"><span class="icon">👑</span> Halaman Admin</a>
+    <a href="/users" id="manage-users-link"><span class="icon">👥</span> Kelola Pengguna</a>
+    <a href="/autodelete" id="autodelete-link"><span class="icon">🗑️</span> Auto Delete</a>
+    <a href="#" id="sidebar-logout-btn" onclick="logout()"><span class="icon">🚪</span> Keluar</a>
+  </nav>
+
+  <div id="notification-container"></div>
+  <div class="overlay"></div>
+  <header>
+    <button id="menu-btn" class="header-btn" style="left: 20px">&#9776;</button>
+    <img class="logo" src="https://files.catbox.moe/bzkzuc.jpg" alt="Logo" />
+    <div style="font-size: 22px; font-weight: 700; letter-spacing: 0.3px">Asta Panel 🦅</div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-pressed="false" title="Ganti tema">
+      <span id="theme-icon" aria-hidden="true">🌙</span>
+    </button>
+  </header>
+
+  <main>
+    <div class="card" id="card-asta">
+      <h2>Tambah Server (Buyer Asta)</h2>
+      <p class="subtitle">Buat server untuk akun Buyer Asta yang sudah ada</p>
+      
+      <div id="panel-selector-asta-group" style="display: none;">
+        <label class="panel-label">Panel Aktif</label>
+        <div class="panel-selector-container" id="panel-selector-asta">
+          <div class="panel-selector-header">
+            <div id="current-panel-display-asta">
+              <span class="status-dot"></span>
+              <span id="current-panel-name-asta">Memuat...</span>
+            </div>
+            <span class="arrow"></span>
+          </div>
+          <ul class="panel-options" id="panel-options-asta"></ul>
+        </div>
+      </div>
+
+      <form id="add-server-form-asta" novalidate>
+        <div class="form-group">
+          <label for="user-id-asta">ID Akun Panel</label>
+          <input type="text" id="user-id-asta" placeholder="Masukkan ID Akun Pterodactyl" required />
+        </div>
+        <div class="form-group">
+          <label for="server-name-asta">Nama Server</label>
+          <input type="text" id="server-name-asta" placeholder="Contoh: server-keren" required />
+        </div>
+        <div class="form-group">
+          <label for="ram-asta">RAM Panel</label>
+          <div class="custom-select-wrapper" id="ram-selector-asta">
+            <div class="custom-select-trigger">
+              <span>Pilih RAM</span>
+              <span class="arrow"></span>
+            </div>
+            <div class="custom-options">
+              <div class="custom-option" data-value="1gb">1 GB</div>
+              <div class="custom-option" data-value="2gb">2 GB</div>
+              <div class="custom-option" data-value="3gb">3 GB</div>
+              <div class="custom-option" data-value="4gb">4 GB</div>
+              <div class="custom-option" data-value="5gb">5 GB</div>
+              <div class="custom-option" data-value="6gb">6 GB</div>
+              <div class="custom-option" data-value="7gb">7 GB</div>
+              <div class="custom-option" data-value="8gb">8 GB</div>
+              <div class="custom-option" data-value="9gb">9 GB</div>
+              <div class="custom-option" data-value="10gb">10 GB</div>
+              <div class="custom-option" data-value="unli">Unlimited</div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <button id="add-server-btn-asta" type="submit">Tambah Server (Asta)</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card" id="card-luar">
+      <h2 id="card-luar-title">Tambah Server (Buyer Luar)</h2>
+      <p class="subtitle" id="card-luar-subtitle">Buat server untuk akun Buyer Luar yang sudah ada</p>
+
+      <div id="panel-selector-luar-group" style="display: none;">
+        <label class="panel-label">Panel Aktif</label>
+        <div class="panel-selector-container" id="panel-selector-luar">
+          <div class="panel-selector-header">
+            <div id="current-panel-display-luar">
+              <span class="status-dot"></span>
+              <span id="current-panel-name-luar">Memuat...</span>
+            </div>
+            <span class="arrow"></span>
+          </div>
+          <ul class="panel-options" id="panel-options-luar"></ul>
+        </div>
+      </div>
+
+      <form id="add-server-form-luar" novalidate>
+        <div class="form-group">
+          <label for="user-id-luar">ID Akun Panel</label>
+          <input type="text" id="user-id-luar" placeholder="Masukkan ID Akun Pterodactyl" required />
+        </div>
+        <div class="form-group">
+          <label for="server-name-luar">Nama Server</label>
+          <input type="text" id="server-name-luar" placeholder="Contoh: server-keren" required />
+        </div>
+        <div class="form-group">
+          <label for="ram-luar">RAM Panel</label>
+          <div class="custom-select-wrapper" id="ram-selector-luar">
+            <div class="custom-select-trigger">
+              <span>Pilih RAM</span>
+              <span class="arrow"></span>
+            </div>
+            <div class="custom-options">
+              <div class="custom-option" data-value="1gb">1 GB</div>
+              <div class="custom-option" data-value="2gb">2 GB</div>
+              <div class="custom-option" data-value="3gb">3 GB</div>
+              <div class="custom-option" data-value="4gb">4 GB</div>
+              <div class="custom-option" data-value="5gb">5 GB</div>
+              <div class="custom-option" data-value="6gb">6 GB</div>
+              <div class="custom-option" data-value="7gb">7 GB</div>
+              <div class="custom-option" data-value="8gb">8 GB</div>
+              <div class="custom-option" data-value="9gb">9 GB</div>
+              <div class="custom-option" data-value="10gb">10 GB</div>
+              <div class="custom-option" data-value="unli">Unlimited</div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <button id="add-server-btn-luar" type="submit">Tambah Server (Luar)</button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <footer>© <span id="y"></span> Asta Panel 🦅 · Dibuat dengan ❤</footer>
+
+  <script>
+    document.getElementById("y").textContent = new Date().getFullYear();
+
+    function showToast(message, type = "success") {
+      const container = document.getElementById("notification-container");
+      const toast = document.createElement("div");
+      toast.className = `toast ${type}`;
+      toast.textContent = message;
+      container.appendChild(toast);
+      setTimeout(() => toast.classList.add("show"), 100);
+      setTimeout(() => {
+        toast.classList.remove("show");
+        toast.addEventListener("transitionend", () => toast.remove());
+      }, 5000);
+    }
+
+    // --- Logika Tema ---
+    const themeToggleBtn = document.getElementById("theme-toggle");
+    function applyThemeUI(theme) {
+      const isDark = theme === "dark";
+      document.querySelector('meta[name="theme-color"]').setAttribute("content", isDark ? "#0b1220" : "#e6f0ff");
+      themeToggleBtn.querySelector("#theme-icon").textContent = isDark ? "☀️" : "🌙";
+    }
+    function setTheme(theme) {
+      document.documentElement.setAttribute("data-theme", theme);
+      try { localStorage.setItem("theme", theme); } catch (e) {}
+      applyThemeUI(theme);
+    }
+    themeToggleBtn.addEventListener("click", () => setTheme(document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark"));
+    setTheme(localStorage.getItem("theme") || "light");
+    // --- Akhir Logika Tema ---
+
+    // --- Logika Sidebar Toggle ---
+    const menuBtn = document.getElementById("menu-btn");
+    const sidebar = document.getElementById("sidebar");
+    const overlay = document.getElementById("sidebar-overlay");
+    function toggleSidebar() {
+      sidebar.classList.toggle("open");
+      overlay.classList.toggle("show");
+    }
+    menuBtn.addEventListener("click", toggleSidebar);
+    document.getElementById("sidebar-close-btn").addEventListener("click", toggleSidebar);
+    overlay.addEventListener("click", toggleSidebar);
+    // --- Akhir Sidebar Toggle ---
+
+    // --- Logika Form Global ---
+    function setupRamSelector(selectorId) {
+      const ramSelector = document.getElementById(selectorId);
+      const ramTrigger = ramSelector.querySelector(".custom-select-trigger");
+      const ramTriggerText = ramTrigger.querySelector("span");
+      const ramOptions = ramSelector.querySelectorAll(".custom-option");
+      let selectedValue = "";
+
+      ramTrigger.addEventListener("click", () => {
+        ramSelector.classList.toggle("open");
+      });
+
+      ramOptions.forEach((option) => {
+        option.addEventListener("click", function () {
+          ramOptions.forEach((opt) => opt.classList.remove("selected"));
+          this.classList.add("selected");
+          selectedValue = this.dataset.value;
+          ramTriggerText.textContent = this.textContent;
+          ramSelector.classList.remove("open");
+        });
+      });
+      
+      return {
+        getValue: () => selectedValue,
+        reset: () => {
+          selectedValue = "";
+          ramTriggerText.textContent = "Pilih RAM";
+          ramOptions.forEach((opt) => opt.classList.remove("selected"));
+        }
+      };
+    }
+
+    const ramAsta = setupRamSelector("ram-selector-asta");
+    const ramLuar = setupRamSelector("ram-selector-luar");
+
+    window.addEventListener("click", function (e) {
+      if (!document.getElementById("ram-selector-asta").contains(e.target)) {
+        document.getElementById("ram-selector-asta").classList.remove("open");
+      }
+      if (!document.getElementById("ram-selector-luar").contains(e.target)) {
+        document.getElementById("ram-selector-luar").classList.remove("open");
+      }
+      if (document.getElementById("panel-selector-asta") && !document.getElementById("panel-selector-asta").contains(e.target)) {
+        document.getElementById("panel-selector-asta").classList.remove("open");
+      }
+      if (document.getElementById("panel-selector-luar") && !document.getElementById("panel-selector-luar").contains(e.target)) {
+        document.getElementById("panel-selector-luar").classList.remove("open");
+      }
+    });
+
+    async function handleFormSubmit(e, buyerType) {
+      e.preventDefault();
+      
+      const isAsta = buyerType === 'asta';
+      const form = isAsta ? document.getElementById("add-server-form-asta") : document.getElementById("add-server-form-luar");
+      const btn = isAsta ? document.getElementById("add-server-btn-asta") : document.getElementById("add-server-btn-luar");
+      const userIdInput = isAsta ? document.getElementById("user-id-asta") : document.getElementById("user-id-luar");
+      const serverNameInput = isAsta ? document.getElementById("server-name-asta") : document.getElementById("server-name-luar");
+      const ramSelector = isAsta ? ramAsta : ramLuar;
+
+      const userId = userIdInput.value.trim();
+      const serverName = serverNameInput.value.trim();
+      const ram = ramSelector.getValue();
+      const userRole = sessionStorage.getItem("creatorRole");
+      const activePanelId = sessionStorage.getItem("activePanelId");
+
+      if (!userId || !serverName || !ram) {
+        showToast("Semua field wajib diisi!", "error");
+        return;
+      }
+      if (userRole === "admin_website" && !activePanelId) {
+        showToast("Admin Website harus memilih panel aktif dulu!", "error");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = "Menambahkan...";
+      
+      try {
+        const response = await fetch("/api/addserver", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userId,
+            serverName,
+            ram,
+            creatorRole: userRole,
+            panelId: activePanelId, 
+            loggedInUsername: localStorage.getItem("username"),
+            buyerType: buyerType, // 'asta', 'luar', atau null/undefined
+          }),
+        });
+        const data = await response.json();
+        
+        if (data.status) {
+          showToast(data.message, "success");
+          form.reset();
+          ramSelector.reset();
+        } else {
+          showToast(data.message, "error");
+        }
+      } catch (err) {
+        showToast("Gagal menambah server. Terjadi kesalahan jaringan.", "error");
+      } finally {
+        btn.disabled = false;
+        if (btn.id === 'add-server-btn-asta') {
+            btn.textContent = "Tambah Server (Asta)";
+        } else if (btn.id === 'add-server-btn-luar') {
+            if (document.getElementById('card-luar-title').textContent.includes('Umum')) {
+                btn.textContent = "Tambah Server";
+            } else {
+                btn.textContent = "Tambah Server (Luar)";
+            }
+        }
+      }
+    }
+
+    document.getElementById("add-server-form-asta").addEventListener("submit", (e) => handleFormSubmit(e, 'asta'));
+    document.getElementById("add-server-form-luar").addEventListener("submit", (e) => handleFormSubmit(e, 'luar'));
+    // --- Akhir Logika Form ---
+
+    // --- Logika Login & Tampilan ---
+    function logout() {
+      fetch("/logout", { method: "GET" }).then(() => {
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.href = "/login";
+      });
+    }
+    document.getElementById("sidebar-logout-btn").addEventListener("click", (e) => {
+      e.preventDefault();
+      logout();
+    });
+
+    function populateSidebarProfile(username, userRole) {
+      const profileName = document.querySelector(".profile-name");
+      const profileRole = document.querySelector(".profile-role");
+      if (profileName && profileRole) {
+        profileName.textContent = username || "Pengguna";
+        let role = userRole || "Tidak Diketahui";
+        role = role.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+        profileRole.textContent = role;
+      }
+    }
+
+    // [PERUBAHAN] Modifikasi initializePanelSelector
+    function setupPanelSelector(idSuffix) {
+      const group = document.getElementById(`panel-selector-${idSuffix}-group`);
+      if(group) group.style.display = "block";
+      
+      const selector = document.getElementById(`panel-selector-${idSuffix}`);
+      if(selector) selector.querySelector(".panel-selector-header").addEventListener("click", () => {
+        selector.classList.toggle("open");
+      });
+    }
+    
+    async function initializePanelSelector(userRole) {
+      if (userRole !== "admin_website") return;
+
+      // [PERUBAHAN] Hanya setup dropdown 'luar' (Umum)
+      // setupPanelSelector('asta'); 
+      setupPanelSelector('luar');
+      
+      try {
+        const response = await fetch("/api/panels");
+        const data = await response.json();
+        if (data.status) {
+          const containers = {
+            // asta: document.getElementById("panel-options-asta"),
+            luar: document.getElementById("panel-options-luar")
+          };
+          // containers.asta.innerHTML = "";
+          containers.luar.innerHTML = "";
+
+          Object.entries(data.panels).forEach(([id, panel]) => {
+            ['luar'].forEach(suffix => { // [PERUBAHAN] Hanya iterasi 'luar'
+              const li = document.createElement("li");
+              li.className = "panel-option";
+              li.dataset.id = id;
+              li.innerHTML = `<span>${panel.name}</span>`;
+              li.addEventListener("click", () => {
+                setActivePanel(id, panel.name, 'luar'); // [PERUBAHAN]
+                // document.getElementById(`panel-selector-asta`).classList.remove("open");
+                document.getElementById(`panel-selector-luar`).classList.remove("open");
+              });
+              containers[suffix].appendChild(li);
+            });
+          });
+
+          const savedPanelId = sessionStorage.getItem("activePanelId");
+          const firstPanelId = Object.keys(data.panels)[0];
+          const firstPanelName = data.panels[firstPanelId].name;
+          
+          if (savedPanelId && data.panels[savedPanelId]) {
+            // setActivePanel(savedPanelId, data.panels[savedPanelId].name, 'asta');
+            setActivePanel(savedPanelId, data.panels[savedPanelId].name, 'luar');
+          } else {
+            // setActivePanel(firstPanelId, firstPanelName, 'asta');
+            setActivePanel(firstPanelId, firstPanelName, 'luar');
+          }
+        }
+      } catch (error) {
+        // document.getElementById("current-panel-name-asta").textContent = "Gagal";
+        document.getElementById("current-panel-name-luar").textContent = "Gagal memuat";
+      }
+    }
+
+    // [PERUBAHAN] Modifikasi setActivePanel
+    function setActivePanel(id, name, suffix) {
+      if (suffix === 'luar') { // [PERUBAHAN] Hanya proses 'luar'
+        sessionStorage.setItem("activePanelId", id);
+        document.getElementById(`current-panel-name-${suffix}`).textContent = name;
+        document.querySelectorAll(`#panel-options-${suffix} .panel-option`).forEach((opt) => {
+          opt.classList.toggle("active", opt.dataset.id === id);
+        });
+      }
+    }
+
+    // [PERUBAHAN LOGIKA UTAMA v4]
+    function setupPage(username, userRole, isMainDb, isPanel3User) {
+      populateSidebarProfile(username, userRole);
+
+      const globalPanelLink = document.getElementById("admin-global-panel-link");
+      const globalServerLink = document.getElementById("admin-global-server-link");
+      const panelAstaLink = document.getElementById("panel-asta-link"); // Ini link "Buat Panel"
+      const serverAstaLink = document.getElementById("server-asta-link"); // Ini link "Tambah Server"
+      const adminPageLink = document.getElementById("admin-page-link");
+      const manageUsersLink = document.getElementById("manage-users-link");
+      const autodeleteLink = document.getElementById("autodelete-link");
+      
+      const panelLuarLink = document.getElementById("panel-luar-link");
+      const serverLuarLink = document.getElementById("server-luar-link");
+      if (panelLuarLink) panelLuarLink.style.display = 'none';
+      if (serverLuarLink) serverLuarLink.style.display = 'none';
+
+      // --- [LOGIKA BARU ANDA v4] ---
+      const cardAsta = document.getElementById('card-asta');
+      const cardLuar = document.getElementById('card-luar');
+      const mainElement = document.querySelector('main');
+
+      if (isPanel3User) {
+          // 1. Tampilan Pengguna Panel 3 (Umum)
+          if (cardAsta) cardAsta.style.display = 'none'; 
+          document.getElementById('card-luar-title').textContent = 'Tambah Server (Umum)';
+          document.getElementById('card-luar-subtitle').textContent = 'Buat server untuk akun Anda.';
+          document.getElementById('add-server-btn-luar').textContent = 'Tambah Server';
+          if (mainElement) {
+              mainElement.style.justifyContent = 'center';
+              mainElement.style.flexDirection = 'column';
+              mainElement.style.alignItems = 'center';
+          }
+      } else if (userRole === 'admin_website') {
+          // 2. Tampilan Admin Website (Umum dengan Pilihan Panel)
+          if (cardAsta) cardAsta.style.display = 'none';
+          document.getElementById('card-luar-title').textContent = 'Tambah Server (Admin)';
+          document.getElementById('card-luar-subtitle').textContent = 'Pilih panel tujuan dan lengkapi data.';
+          document.getElementById('add-server-btn-luar').textContent = 'Tambah Server';
+          if (mainElement) {
+              mainElement.style.justifyContent = 'center';
+              mainElement.style.flexDirection = 'column';
+              mainElement.style.alignItems = 'center';
+          }
+      } else if (isMainDb === false) { 
+          // 3. Tampilan Buyer Luar (Bukan Panel 3)
+          if (cardAsta) cardAsta.style.display = 'none'; 
+          if (mainElement) {
+              mainElement.style.justifyContent = 'center';
+              mainElement.style.flexDirection = 'column';
+              mainElement.style.alignItems = 'center';
+          }
+      }
+      // 4. Tampilan Staf (isMainDb: true, non-admin) -> Biarkan default (2 kartu)
+      // --- [AKHIR LOGIKA BARU v4] ---
+
+
+      if (userRole === "admin_website") {
+        if (globalPanelLink) globalPanelLink.style.display = "flex";
+        if (globalServerLink) globalServerLink.style.display = "flex";
+        if (panelAstaLink) panelAstaLink.style.display = "none";
+        if (serverAstaLink) serverAstaLink.style.display = "none";
+        
+        if (adminPageLink) adminPageLink.style.display = "flex";
+        if (manageUsersLink) manageUsersLink.style.display = "flex";
+        if (autodeleteLink) autodeleteLink.style.display = "flex";
+        
+        initializePanelSelector(userRole);
+      
+      } else if (userRole === "reseller") {
+        if (globalPanelLink) globalPanelLink.style.display = "none";
+        if (globalServerLink) globalServerLink.style.display = "none";
+        if (panelAstaLink) panelAstaLink.style.display = "flex";
+        if (serverAstaLink) serverAstaLink.style.display = "flex";
+        
+        if (adminPageLink) adminPageLink.style.display = "none";
+        if (manageUsersLink) manageUsersLink.style.display = "none";
+        if (autodeleteLink) autodeleteLink.style.display = "none";
+      
+      } else { // CEO, Owner, dll
+        if (globalPanelLink) globalPanelLink.style.display = "none";
+        if (globalServerLink) globalServerLink.style.display = "none";
+        if (panelAstaLink) panelAstaLink.style.display = "flex";
+        if (serverAstaLink) serverAstaLink.style.display = "flex";
+        
+        if (adminPageLink) adminPageLink.style.display = "flex";
+        if (manageUsersLink) manageUsersLink.style.display = "none";
+        if (autodeleteLink) autodeleteLink.style.display = "none";
+      }
+    }
+
+    async function checkLogin() {
+      try {
+        const res = await fetch("/api/me");
+        const data = await res.json();
+        if (!data.loggedIn) {
+          window.location.href = "/login";
+          return;
+        }
+        const { user, role, isMainDb, isPanel3User } = data;
+        localStorage.setItem("username", user);
+        localStorage.setItem("role", role);
+        sessionStorage.setItem("creatorRole", role);
+        
+        setupPage(user, role, isMainDb, isPanel3User);
+      } catch (err) {
+        window.location.href = "/login";
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", checkLogin);
+  </script>
+</body>
+</html>
