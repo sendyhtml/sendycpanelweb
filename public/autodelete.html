@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Auto Delete - Asta Panel 🦅</title>
+    <meta name="theme-color" content="#e6f0ff" />
+    <link rel="icon" href="https://files.catbox.moe/bzkzuc.jpg" />
+    <link rel="stylesheet" href="styles/autodelete.css" />
+    <script>
+      (function () {
+        try {
+          const stored = localStorage.getItem("theme");
+          const prefersDark =
+            window.matchMedia &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches;
+          const theme = stored || (prefersDark ? "dark" : "light");
+          document.documentElement.setAttribute("data-theme", theme);
+        } catch (e) {}
+      })();
+    </script>
+    <style>
+      .panel-selector-container {
+        position: relative;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background-color: var(--input-bg);
+        margin-bottom: 24px;
+      }
+      .panel-selector-header {
+        padding: 12px 16px;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      #current-panel-display {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+      #current-panel-display .status-dot {
+        width: 8px;
+        height: 8px;
+        background-color: var(--success);
+        border-radius: 50%;
+      }
+      .panel-selector-header .arrow {
+        border: solid var(--text-secondary);
+        border-width: 0 2px 2px 0;
+        display: inline-block;
+        padding: 3px;
+        transform: rotate(45deg);
+        transition: transform 0.2s ease;
+      }
+      .panel-selector-container.open .arrow {
+        transform: rotate(-135deg);
+      }
+      .panel-options {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease, padding 0.3s ease;
+        border-top: 1px solid transparent;
+        position: absolute;
+        width: 100%;
+        left: 0;
+        background-color: var(--card-bg);
+        border: 1px solid var(--border);
+        border-top: none;
+        border-radius: 0 0 12px 12px;
+        z-index: 20;
+      }
+      .panel-selector-container.open .panel-options {
+        max-height: 200px;
+        padding: 5px 0;
+      }
+      .panel-option {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 20px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        font-weight: 500;
+      }
+      .panel-option.active {
+        background-color: var(--brand);
+        color: white;
+      }
+      .panel-option:not(.active):hover {
+        background-color: rgba(37, 99, 235, 0.1);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="sidebar-overlay" class="sidebar-overlay"></div>
+    <nav id="sidebar" class="sidebar">
+      <button id="sidebar-close-btn" class="close-btn">&times;</button>
+
+      <div class="sidebar-profile">
+        <img
+          src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iY3VycmVudENvbG9yIj48cGF0aCBkPSJNMTIgMTJjMi4yMSAwIDQtMS43OSA0LTRzLTEuNzktNC00LTQtNCAxLjc5LTQgNCAxLjc5IDQgNCA0em0wIDJjLTIuNjcgMC04IDEuMzQtOCA0djJoMTZ2LTJjMC0yLjY2LTUuMzMtNC04LTR6Ii8+PC9zdmc+"
+          alt="Profile"
+          class="profile-pic"
+        />
+        <div class="profile-details">
+          <span class="profile-name">Memuat...</span>
+          <span class="profile-role">Memuat...</span>
+        </div>
+      </div>
+
+      <a href="/panel" id="admin-global-panel-link">
+        <span class="icon">📊</span> Buat Panel
+      </a>
+      <a href="/add-server" id="admin-global-server-link">
+        <span class="icon">➕</span> Tambah Server
+      </a>
+      
+      <a href="/panel" id="panel-asta-link" style="display: none;">
+        <span class="text"><span class="icon">📊</span>Buat Panel</span>
+      </a>
+      <a href="/add-server" id="server-asta-link" style="display: none;">
+        <span class="text"><span class="icon">➕</span>Add Server</span>
+      </a>
+      <a href="/admin" id="admin-page-link"
+        ><span class="icon">👑</span> Halaman Admin</a
+      >
+      <a href="/users" id="manage-users-link"
+        ><span class="icon">👥</span> Kelola Pengguna</a
+      >
+      <a href="/autodelete" id="autodelete-link"
+        ><span class="icon">🗑️</span> Auto Delete</a
+      >
+      <a href="#" id="sidebar-logout-btn">
+        <span class="icon">🚪</span> Keluar
+      </a>
+      </nav>
+
+    <div id="notification-container"></div>
+    <div class="overlay"></div>
+    <header>
+      <button id="menu-btn" class="header-btn" style="left: 20px">
+        &#9776;
+      </button>
+      <img class="logo" src="https://files.catbox.moe/bzkzuc.jpg" alt="Logo" />
+      <div style="font-size: 22px; font-weight: 700">Auto Delete Panel</div>
+      <button
+        id="theme-toggle"
+        class="theme-toggle"
+        type="button"
+        aria-pressed="false"
+        title="Ganti tema"
+      >
+        <span id="theme-icon" aria-hidden="true">🌙</span>
+      </button>
+    </header>
+    <main>
+      <div class="card">
+        <h2>Mulai Proses Hapus Otomatis</h2>
+        <p class="subtitle">
+          Fitur ini akan menghapus pengguna dan server yang tidak memenuhi
+          kriteria. Pengguna dalam daftar `antidelpanel.json` akan dilewati.
+        </p>
+
+        <div id="panel-selector-wrapper" style="display: none">
+          <label
+            style="
+              display: block;
+              margin-bottom: 5px;
+              font-weight: bold;
+              font-size: 13px;
+              color: var(--text-secondary);
+            "
+            >Pilih Panel Target</label
+          >
+          <div class="panel-selector-container" id="panel-selector">
+            <div class="panel-selector-header">
+              <div id="current-panel-display">
+                <span class="status-dot"></span>
+                <span id="current-panel-name">Memuat panel...</span>
+              </div>
+              <span class="arrow"></span>
+            </div>
+            <ul class="panel-options" id="panel-options-container"></ul>
+          </div>
+        </div>
+
+        <div>
+          <label
+            style="
+              display: block;
+              margin-bottom: 5px;
+              font-weight: bold;
+              font-size: 13px;
+              color: var(--text-secondary);
+            "
+            >Pilih Mode Penghapusan</label
+          >
+          <div class="panel-selector-container" id="mode-selector">
+            <div class="panel-selector-header">
+              <div id="current-mode-display">
+                <span id="current-mode-name"
+                  >Hapus Total (Pengguna & Server)</span
+                >
+              </div>
+              <span class="arrow"></span>
+            </div>
+            <ul class="panel-options" id="mode-options-container">
+              <li class="panel-option active" data-mode="total">
+                Hapus Total (Pengguna & Server)
+              </li>
+              <li class="panel-option" data-mode="inactive">
+                Hapus Pengguna & Server Tidak Aktif
+              </li>
+              <li class="panel-option" data-mode="only-inactive-servers">
+                Hapus Server Tidak Aktif Saja
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <button id="start-delete-btn" class="action-btn">Mulai Proses</button>
+        <div class="log-container">
+          <h3>Log Proses:</h3>
+          <pre id="log-output"></pre>
+        </div>
+      </div>
+    </main>
+    <script src="js/autodelete.js"></script>
+    <footer>© <span id="y"></span> Asta Panel 🦅 · Dibuat dengan ❤</footer>
+  </body>
+</html>
