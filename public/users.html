@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Daftar Pengguna - Asta Panel 🦅</title>
+  <meta name="theme-color" content="#e6f0ff"/>
+  <link rel="icon" href="https://files.catbox.moe/bzkzuc.jpg" />
+  <link rel="stylesheet" href="styles/users.css">
+  <script>
+    (function(){
+      try {
+        const stored = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const theme = stored || (prefersDark ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {}
+    })();
+  </script>
+  <style>
+    main {
+        align-items: flex-start;
+        padding-top: 50px;
+    }
+    .card {
+        max-width: 800px;
+    }
+    .user-stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 25px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--border);
+    }
+    .stat-item {
+        background-color: var(--input-bg);
+        border: 1px solid var(--border);
+        padding: 10px 15px;
+        border-radius: 10px;
+        text-align: center;
+        flex-grow: 1;
+    }
+    .stat-item .count {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--brand);
+    }
+    .stat-item .label {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        text-transform: capitalize;
+    }
+    .filter-controls {
+        display: flex;
+        flex-wrap: wrap; /* [BARU] Memungkinkan wrap jika layar kecil */
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    .filter-controls label {
+        font-weight: bold;
+        color: var(--text-secondary);
+        font-size: 13px;
+    }
+    
+    /* [BARU] CSS untuk Dropdown Kustom */
+    .custom-select-wrapper {
+      position: relative;
+      user-select: none;
+      width: 220px;
+    }
+    .custom-select-trigger {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      background: var(--input-bg);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      height: 42px;
+      box-sizing: border-box;
+    }
+    .custom-select-wrapper.open .custom-select-trigger {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+      border-color: var(--brand-strong);
+      box-shadow: 0 0 0 4px var(--ring);
+    }
+    .custom-select-trigger .arrow {
+      border: solid var(--text-secondary);
+      border-width: 0 2px 2px 0;
+      display: inline-block;
+      padding: 3px;
+      transform: rotate(45deg);
+      transition: transform 0.2s ease;
+    }
+    .custom-select-wrapper.open .arrow {
+      transform: rotate(-135deg);
+    }
+    .custom-options {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 12px 12px;
+      z-index: 10;
+      max-height: 0;
+      overflow-y: auto;
+      transition: max-height 0.3s ease-out;
+      box-shadow: var(--shadow);
+    }
+    .custom-select-wrapper.open .custom-options {
+      max-height: 220px; 
+    }
+    .custom-option {
+      padding: 12px 20px;
+      cursor: pointer;
+      color: var(--text-primary);
+      transition: background-color 0.2s;
+    }
+    .custom-option.selected {
+      background-color: var(--brand);
+      color: white;
+      font-weight: 600;
+    }
+    .custom-option:not(.selected):hover {
+      background-color: rgba(37, 99, 235, 0.1);
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    th, td {
+        border: 1px solid var(--border);
+        padding: 12px;
+        text-align: left;
+        text-transform: capitalize;
+    }
+    th {
+        background-color: rgba(0,0,0,0.05);
+    }
+    [data-theme="dark"] th {
+        background-color: rgba(255,255,255,0.05);
+    }
+    .action-btn {
+        padding: 6px 10px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        color: white;
+        margin-right: 5px;
+        font-weight: 600;
+    }
+    .edit-btn { background-color: #3b82f6; }
+    .delete-btn { background-color: #ef4444; }
+  </style>
+</head>
+<body>
+  <div id="sidebar-overlay" class="sidebar-overlay"></div>
+    <nav id="sidebar" class="sidebar">
+    <button id="sidebar-close-btn" class="close-btn">&times;</button>
+    
+    <div class="sidebar-profile">
+      <img 
+        src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iY3VycmVudENvbG9yIj48cGF0aCBkPSJNMTIgMTJjMi4yMSAwIDQtMS43OSA0LTRzLTEuNzktNC00LTQtNCAxLjc5LTQgNCAxLjc5IDQgNCA0em0wIDJjLTIuNjcgMC04IDEuMzQtOCA0djJoMTZ2LTJjMC0yLjY2LTUuMzMtNC04LTR6Ii8+PC9zdmc+" 
+        alt="Profile" 
+        class="profile-pic"
+      />
+      <div class="profile-details">
+        <span class="profile-name">Memuat...</span>
+        <span class="profile-role">Memuat...</span>
+      </div>
+    </div>
+
+    <a href="/panel" id="admin-global-panel-link">
+      <span class="icon">📊</span> Buat Panel
+    </a>
+    <a href="/add-server" id="admin-global-server-link">
+      <span class="icon">➕</span> Tambah Server
+    </a>
+
+    <a href="/panel" id="panel-asta-link" style="display: none;">
+      <span class="text"><span class="icon">📊</span>Buat Panel</span>
+    </a>
+    <a href="/add-server" id="server-asta-link" style="display: none;">
+      <span class="text"><span class="icon">➕</span>Add Server</span>
+    </a>
+    <a href="/admin" id="admin-page-link"><span class="icon">👑</span> Halaman Admin</a>
+    <a href="/users" id="manage-users-link"><span class="icon">👥</span> Kelola Pengguna</a>
+    <a href="/autodelete" id="autodelete-link"><span class="icon">🗑️</span> Auto Delete</a>
+    <a href="#" id="sidebar-logout-btn">
+      <span class="icon">🚪</span> Keluar
+    </a>
+    </nav>
+
+  <div id="notification-container"></div>
+  <div class="overlay"></div>
+  <header>
+    <button id="menu-btn" class="header-btn" style="left: 20px;">&#9776;</button>
+    <img class="logo" src="https://files.catbox.moe/bzkzuc.jpg" alt="Logo"/>
+    <div style="font-size: 22px; font-weight: 700;">Daftar Pengguna</div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-pressed="false" title="Ganti tema">
+      <span id="theme-icon" aria-hidden="true">🌙</span>
+    </button>
+  </header>
+  <main>
+    <div class="card">
+      <h2>Manajemen Pengguna</h2>
+      <div class="user-stats" id="user-stats-container"></div>
+      
+      <div class="filter-controls">
+        <label for="db-filter">Pilih Database:</label>
+        <div class="custom-select-wrapper" id="db-filter-wrapper">
+          <div class="custom-select-trigger">
+              <span id="db-filter-trigger-text">user.json</span>
+              <span class="arrow"></span>
+          </div>
+          <div class="custom-options" id="db-filter-options">
+              <div class="custom-option selected" data-value="user.json">user.json</div>
+              <div class="custom-option" data-value="user-buyerluar.json">user-buyerluar.json</div>
+              <div class="custom-option" data-value="user-panel3.json">user-panel3.json</div>
+          </div>
+        </div>
+
+        <label for="role-filter">Filter Peran:</label>
+        <div class="custom-select-wrapper" id="role-filter-wrapper">
+          <div class="custom-select-trigger">
+              <span id="filter-trigger-text">Semua Peran</span>
+              <span class="arrow"></span>
+          </div>
+          <div class="custom-options" id="role-filter-options">
+              </div>
+        </div>
+        <button id="delete-all-btn" class="action-btn delete-btn" style="margin-left: 10px; height: 42px;">Hapus Semua</button>
+      </div>
+
+      <div class="table-wrapper">
+        <table id="user-table">
+          <thead>
+            <tr>
+              <th>Nama</th>
+              <th>Role</th>
+              <th>Waktu Dibuat</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="user-list-table"></tbody>
+        </table>
+      </div>
+
+      <div class="pagination-controls" id="pagination-controls" style="display: none; margin-top: 20px; text-align: center;">
+        <button id="prev-page-btn" class="action-btn edit-btn" style="margin-right: 10px;">←</button>
+        <span id="page-info">Halaman 1 dari 1</span>
+        <button id="next-page-btn" class="action-btn edit-btn" style="margin-left: 10px;">→</button>
+      </div>
+    </div>
+  </main>
+  <script src="js/users.js"></script>
+  <footer>© <span id="y"></span> Asta Panel 🦅 · Dibuat dengan ❤</footer>
+</html>
